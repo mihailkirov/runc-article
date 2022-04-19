@@ -10,5 +10,7 @@ RUN apk update && \
 
 COPY . /h00ks/
 ENV CDIR="/h00ks"
-ENTRYPOINT ["/bin/bash", "-c"]
-CMD /h00ks/run.sh
+ENV SCRIPT_DIR="/h00ks/scripts-hooks"
+ENV ADDCNF="/h00ks/config-add.json" 
+WORKDIR "/h00ks"
+CMD run.sh

@@ -1,16 +1,13 @@
 {
 	"ociVersion": "1.0.2-dev",
-	
 	"process": {
-		"terminal": false,
+		"terminal": true,
 		"user": {
 			"uid": 0,
 			"gid": 0
 		},
 		"args": [
-			"/bin/sh",
-			"-c",
-			"curl -XGET 172.12.0.11:8080 > ./home/write-results/ContComm.txt"
+			"sh"
 		],
 		"env": [
 			"PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
@@ -58,68 +55,7 @@
 		"readonly": true
 	},
 	"hostname": "runc",
-	"hooks":{
-		"createRuntime": [
-			{
-				
-				"path":	"/bin/bash", 
-				"args": ["/bin/bash", "-c", "../scripts-hooks/runtimeCreate.sh"]	
-			}
-		],
-		"createContainer": [
-			{
-				
-				"path": "/bin/bash",
-				"args": ["/bin/bash", "-c", "./home/tmpfssc/containerCreate.sh"]
-			
-			}
-		],
-		"poststart": [
-		       {
-		       	
-		        "path": "/bin/bash",
-			    "args": ["/bin/bash", "-c", "../scripts-hooks/postStart.sh"]
-				    
-		       }
-		],
-		"startContainer": [
-		        {        	
-		        
-		        "path": "/bin/sh",
-			    "args": ["/bin/sh", "-c", "/home/tmpfssc/startContainer.sh"]
-		        
-		        }
-		],
-		"poststop": [
-		       {
-		       	
-		       	"path": "/bin/bash",
-			    "args": ["/bin/bash", "-c",  "./scripts-hooks/postStop.sh"]
-			    
-		       }
-		]	
-	},
 	"mounts": [
-		{
-			"destination": "/home/write-results/",
-			"type": "bind",
-			"source": "../results-scripts/",
-			"options": [
-				"rbind", 
-				"rw",
-				"make-shared"
-			]
-		},
-		{
-			"destination": "/home/tmpfssc",
-			"type": "bind",
-			"source":"../scripts-hooks",
-			"options": [
-				"rbind", 
-				"r", 
-				"make-shared"
-			]
-		},
 		{
 			"destination": "/proc",
 			"type": "proc",
@@ -219,9 +155,6 @@
 			},
 			{
 				"type": "mount"
-			},
-			{
-				"type": "cgroup"
 			}
 		],
 		"maskedPaths": [

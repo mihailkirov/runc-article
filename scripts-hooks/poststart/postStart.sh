@@ -10,7 +10,7 @@ SAVETO="results-scripts/postStart.txt";
 python3 $CDIR/scripts-hooks/httph.py; # goes in the background
 
 # give us some info
-echo "POSTSTART" > $CDIR/$SAVETO;
+echo "$0" > $CDIR/$SAVETO;
 for file in /proc/self/ns/*; do
 	readlink $file >> $CDIR/$SAVETO; 
 done

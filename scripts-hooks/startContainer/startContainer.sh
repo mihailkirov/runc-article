@@ -6,7 +6,7 @@
 # relative to the container rootfs path
 SAVETO="/home/write-results/startContainer.txt"
 # give us some info
-echo "STARTCONTAINER" > $SAVETO;
+echo "$0" > $SAVETO;
 for file in /proc/self/ns/*; do
 	readlink $file >> $SAVETO; 
 done

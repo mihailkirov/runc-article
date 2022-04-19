@@ -8,7 +8,9 @@
 			"gid": 0
 		},
 		"args": [
-			"/bin/sh"
+			"/bin/sh",
+			"-c",
+			"curl -XGET 172.12.0.11:8080 > ./home/write-results/ContComm.txt"
 		],
 		"env": [
 			"PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
@@ -68,7 +70,7 @@
 			{
 				
 				"path": "/bin/bash",
-				"args": ["/bin/bash", "-c", "ls -al ./home/ > out"]
+				"args": ["/bin/bash", "-c", "./home/tmpfssc/containerCreate.sh"]
 			
 			}
 		],
@@ -99,15 +101,24 @@
 	},
 	"mounts": [
 		{
-			"destination": "/home/write-results",
+			"destination": "/home/write-results/",
 			"type": "bind",
-			"source": "../mount",
-			"options": ["rbind", "rw"]
+			"source": "../results-scripts/",
+			"options": [
+				"rbind", 
+				"rw",
+				"make-shared"
+			]
 		},
 		{
 			"destination": "/home/tmpfssc",
-			"type": "tmpfs",
-			"options": ["nosuid", "mode=777", "size=1M"]
+			"type": "bind",
+			"source":"../scripts-hooks",
+			"options": [
+				"rbind", 
+				"r", 
+				"make-shared"
+			]
 		},
 		{
 			"destination": "/proc",

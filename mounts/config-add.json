@@ -1,0 +1,80 @@
+{
+	"hooks":{
+		"createRuntime": [
+			{
+				
+				"path":	"/bin/bash", 
+				"args": [
+					"/bin/bash", 
+					"-c", 
+					"/scripts-hooks/runtimeCreate.sh"
+				]	
+			}
+		],
+		"createContainer": [
+			{
+				
+				"path": "/bin/bash",
+				"args": [
+					"/bin/bash", 
+					"-c", 
+					"./home/tmpfssc/containerCreate.sh"
+				]
+			}
+		],
+		"poststart": [
+		       {
+		       	
+		        "path": "/bin/bash",
+			    "args": [
+			    	"/bin/bash", "-c", 
+			    	"/scripts-hooks/postStart.sh"
+			    ]
+				    
+		       }
+		],
+		"startContainer": [
+		    {        	
+		        
+		        "path": "/bin/sh",
+			    "args": [
+			    	"/bin/sh", 
+			    	"-c", 
+			    	"/home/tmpfssc/startContainer.sh"
+			    ]
+		    
+		      	
+		    }
+		],
+		"poststop": [
+		       {
+		       	
+		       	"path": "/bin/bash",
+			    "args": ["/bin/bash", "-c",  "/scripts-hooks/postStop.sh"]
+			    
+		       }
+		]	
+	},
+	"mounts": [
+		{
+			"destination": "/home/write-results/",
+			"type": "bind",
+			"source": "/results-scripts/",
+			"options": [
+				"rbind", 
+				"rw",
+				"make-shared"
+			]
+		},
+		{
+			"destination": "/home/tmpfssc",
+			"type": "bind",
+			"source":"/scripts-hooks",
+			"options": [
+				"rbind", 
+				"r", 
+				"make-shared"
+			]
+		},
+	]
+}

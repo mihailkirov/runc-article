@@ -19,7 +19,7 @@ ip addr add 172.12.0.11/24 dev veth0;
 ip link set veth0 up;
 
 # give us some info
-echo "CREATE_RUNTIME" > $CDIR/$SAVETO;
+echo "$0" > $CDIR/$SAVETO;
 for file in /proc/self/ns/*; do
 	readlink $file >> $CDIR/$SAVETO; 
 done
