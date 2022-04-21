@@ -9,8 +9,11 @@ RUN apk update && \
 	mkdir h00ks
 
 COPY . /h00ks/
-ENV CDIR="/h00ks"
-ENV SCRIPT_DIR="/h00ks/scripts-hooks"
-ENV ADDCNF="/h00ks/config-add.json" 
+ENV CDIR="/h00ks" SCRIPT_DIR="/h00ks/scripts-hooks" ADDCNF="/h00ks/config-add.json" 
 WORKDIR "/h00ks"
-CMD run.sh
+# final setup
+RUN chmod 755 httph.py; \
+	chmod 755 transform.py; \
+	rm results-scripts/*.txt; \
+	rm bundle/config.json 2>/dev/null 
+CMD transform.py
