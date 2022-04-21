@@ -9,6 +9,7 @@ import sys
 import os
 import json
 import subprocess
+import time
 
 
 def read_json(path:str) -> dict:
@@ -81,10 +82,8 @@ def run():
     # create
     with subprocess.Popen([
         "/bin/sh", "-c", "runc create -b {} c".format(os.environ["CDIR"] + "/bundle")
-        ]) as proc: # async
-        proc.wait()
-        if proc.returncode != 0:
-            return None  
+        ], stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE) as proc: # async
+        time.sleep(1)  
     
     # start
     with subprocess.Popen([
