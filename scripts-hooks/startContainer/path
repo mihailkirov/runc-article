@@ -1,2 +1,2 @@
 /bin/sh
-./home/tmpfssc/containerCreate.sh
+./home/tmpfssc/startContainer/startContainer.sh

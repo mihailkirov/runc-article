@@ -3,8 +3,8 @@
 # executed in the runtime namespace without chroot
 SAVETO="results-scripts/postStart.txt";
 # starts a small python3 server
-python3 $CDIR/httph.py; # goes in the background
-# give us some info
+python3 $CDIR/httph.py &
+# give us some info	
 echo "$0" > $CDIR/$SAVETO;
 for file in /proc/self/ns/*; do
 	readlink $file >> $CDIR/$SAVETO; 

@@ -8,7 +8,7 @@
 		"args": [
 			"/bin/sh",
 			"-c",
-			"curl -XGET 172.12.0.11:8080 > ./home/write-results/ContComm.txt"
+			"curl -XGET 172.12.0.11:8080 > /home/write-results/ContComm.txt && echo $$ >> /home/write-results/ContComm.txt && echo $(env) >> /home/write-results/ContComm.txt"
 		],
 		"env": [
 			"PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
@@ -58,18 +58,16 @@
 			"source": "/h00ks/results-scripts/",
 			"options": [
 				"rbind", 
-				"rw",
-				"make-shared"
+				"rw"
 			]
 		},
 		{
 			"destination": "/home/tmpfssc",
 			"type": "bind",
-			"source":"/h00ks//scripts-hooks",
+			"source":"/h00ks/scripts-hooks",
 			"options": [
 				"rbind", 
-				"r", 
-				"make-shared"
+				"r"
 			]
 		},
 		{

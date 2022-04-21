@@ -10,7 +10,6 @@ import os
 import time
 import json
 import subprocess
-import time
 
 
 def read_json(path:str) -> dict:
@@ -26,11 +25,12 @@ def generate_config_return_json() -> dict:
     """Generates a config with runc and returns the result
         as a JSON object. Could potentially raise exceptions.
     """
-    d = os.environ["CDIR"] + "/bundle"
+    
+    dirr = os.environ["CDIR"] + "/bundle"
     with subprocess.Popen([
         "/bin/sh", "-c", "cd {n1}; \
          rm {n2}/config.json 2>/dev/null; \
-         runc spec;".format(n1=d, n2=d)
+         runc spec;".format(n1=dirr, n2=dirr)
         ]) as proc: # async
         proc.wait()
         if proc.returncode != 0:
@@ -38,9 +38,20 @@ def generate_config_return_json() -> dict:
         return read_json("{}/config.json".format(os.environ["CDIR"] + "/bundle"))
 
 
+def add_custom_config(org_conf:dict) -> None: 
+    """Add custom configuration to conf"""
 
-def generate_hooks_from_files() -> dict:
-    """Generate hooks from directory scripthooks"""
+    org_conf["process"]["terminal"] = False # incompatible with the current prog    
+    # this is truly custom
+    if "ADDCNF" in os.environ:
+        additional_cnf = read_json(os.environ["ADDCNF"])
+        for field in additional_cnf.keys():
+            org_conf[field] = additional_cnf[field]
+
+
+
+def generate_hooks() -> dict:
+    """Generate hooks from the directory scripts-hooks contents"""
 
     hooks_dict = {}
     for root, dirs, files in os.walk(os.environ["SCRIPT_DIR"]):
@@ -83,25 +94,27 @@ def generate_hooks_from_files() -> dict:
     return hooks_dict
 
 
-def run():
+def run() -> None:
     """Runs runc.Program flow: create, start, delete"""
 
     print("Creating..")
     # create
     with subprocess.Popen([
-        "/bin/sh", "-c", "runc create -b {} c".format(os.environ["CDIR"] + "/bundle")
+        "/bin/bash", "-c", "runc create -b {} c &".format(os.environ["BUNDLEDIR"])
         ], stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE) as proc: # async
-        time.sleep(1)  
+        proc.wait()
     
+    time.sleep(1)
     print("Starting..")
     # start
     with subprocess.Popen([
-        "/bin/sh", "-c", "runc start c "
+        "/bin/bash", "-c", "runc start c "
         ]) as proc: # async
         proc.wait()
         if proc.returncode != 0:
-            return None
-        # check stdout too
+            print(proc.stderr)
+            sys.exit(proc.returncode)
+    
     time.sleep(1)
     print("Deleting")
     # delete
@@ -110,28 +123,34 @@ def run():
         ]) as proc: # async
         proc.wait()
         if proc.returncode != 0:
-            return None
+            print(proc.stderr)
+            sys.exit(proc.returncode)
+ 
 
     sys.exit(0)
 
-if __name__ == "__main__":
+
+
+def main():
+    """Main function"""
 
     # call runc for config.json generation
     org_conf = generate_config_return_json()
     if not org_conf:
         sys.exit(-1)
-    org_conf["process"]["terminal"] = False # incompatible with the current prog
-    org_conf["hooks"] = generate_hooks_from_files()
+    # customize the original configuration
+    add_custom_config(org_conf)
+    # add hooks
+    org_conf["hooks"] = generate_hooks()
     if not org_conf["hooks"]:
         sys.exit(-1)
-    # this is truly custom
-    if "ADDCNF" in os.environ:
-        additional_cnf = read_json(os.environ["ADDCNF"])
-        for field in additional_cnf.keys():
-            org_conf[field] = additional_cnf[field]
-
-    # write down the modification
-    with open("./bundle/config.json", "w") as file1: # erases old content
+    # write down the configuration file
+    with open("{}/config.json".format(os.environ["BUNDLEDIR"]), "w") as file1: # erases old content
         file1.write(json.dumps(org_conf))
     # launch
     run()
+
+
+if __name__ == "__main__":
+
+    main()
