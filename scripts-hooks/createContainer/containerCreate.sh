@@ -1,3 +1,4 @@
+#!/bin/bash
 # containerCreate script - test env config
 # executes in the container namespace before being chrooted
 

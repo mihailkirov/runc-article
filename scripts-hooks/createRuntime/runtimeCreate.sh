@@ -1,3 +1,4 @@
+#!/bin/bash
 # createRuntime script - init env
 # executes in the runtime namespace without chroot
 

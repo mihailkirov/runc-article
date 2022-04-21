@@ -1,3 +1,4 @@
+#!/bin/bash
 # postStart script - to indicate if the env config and test phase went okey
 # and trigger post-setup actions on the host
 # executed in the runtime namespace without chroot

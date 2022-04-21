@@ -1,2 +1,1 @@
-/bin/bash
-.
+/bin/bash;-c;/h00ks/scripts-hooks/poststop/postStop.sh

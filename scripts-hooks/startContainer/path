@@ -1,2 +1,1 @@
-/bin/sh
-./home/tmpfssc/startContainer/startContainer.sh
+/bin/sh;-c;/home/tmpfssc/startContainer/startContainer.sh
