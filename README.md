@@ -51,7 +51,10 @@ $> docker build -t hook
 Runc needs to be able to create cgroups hence to modify the cgroups vfs which are mounted inside. The default AppArmor policy of Docker doesn't allow that hence a container has to be launched using the `privileged` flag:
 
 ```bash
+$> mkdir results-scripts;
 $> docker run --privileged -it -v $(pwd)/results-scripts/:/h00ks/results-scripts hook
 ```
+After this you can observe the results of the POC scripts in the `results-scripts` directory.
+
 
 
