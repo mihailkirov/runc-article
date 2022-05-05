@@ -1,12 +1,12 @@
 This project is a small POC on the hooks feature of *runc*. It was created as a support for the Quarkslab blogpost article on the container runtime. 
-The program builds a runtime bundle and customize the default config.json file. Then a runc container is launched with the initialized bundle 
+The program builds a runtime bundle and customize the default config.json file. Then a runc container is launched with the initialized bundle. 
 
 
 # Customization of config.json
 
 To customize the fields which are different from the "hooks" json field, create a json file and indicate its position using the `ADDCNF` variable within the Dockerfile.
 
-If you want to add hooks add the directory path where the hooks will be placed to the SCRIPT_DIR variable in the Dockerfile. Please read the format of the hooks directory.
+If you want to add - hooks add the directory path where the hooks will be placed to the SCRIPT_DIR variable in the Dockerfile. Please read the format of the hooks directory.
 
 # Hooks directory
  The hooks directory has to follow the following format:
