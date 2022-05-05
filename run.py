@@ -11,7 +11,7 @@ import subprocess
 
 
 def read_json(path:str) -> dict:
-    """Read a json file referenced by the path variable"""
+    """Read json file referenced by path"""
 
     with open(path, "r") as file:
         js_new = json.load(file)
@@ -19,24 +19,29 @@ def read_json(path:str) -> dict:
 
 
 def generate_config_return_json() -> dict:
-    """Generates a default config.json using runc and returns it."""
+    """The function generates a default config.json 
+       using `runc spec` and then returns it as json (dict)
+    """
     
-    dirr = os.environ["CDIR"] + "/bundle"
+    bundle_dir = os.environ["CDIR"] + "/bundle"
     with subprocess.Popen([
-        "/bin/sh", "-c", "cd {n1}; \
-         rm {n2}/config.json 2>/dev/null; \
-         runc spec;".format(n1=dirr, n2=dirr)
-        ]) as proc: # async
+        "/bin/sh", 
+        "-c", 
+         "rm -f config.json; \
+         runc spec;"],
+         cwd=bundle_dir
+         ) as proc: # async
         proc.wait()
         if proc.returncode != 0:
             return None  
-        return read_json("{}/config.json".format(os.environ["CDIR"] + "/bundle"))
+        return read_json("{}/config.json".format(bundle_dir))
 
 
 def customize(org_conf:dict) -> None: 
-    """Add custom configuration to config.json
-        The customization depends on ADDCNF and SCRIPT_DIR 
-        env variables. """
+    """Add custom configuration to org_conf (config.json).
+       ADDCNF - indicates configuration not related to hooks 
+       SCRIPT_DIR - indicates configuration related to hooks. 
+    """
 
     if "ADDCNF" in os.environ:
         additional_cnf = read_json(os.environ["ADDCNF"])
@@ -48,17 +53,23 @@ def customize(org_conf:dict) -> None:
         org_conf["hooks"] = generate_hooks()
 
 def generate_hooks() -> dict:
-    """Generates a hook dictionary object. 
-        Keys : types of hooks
-        Values: paths to executables"""
+    """ Generates and returns dictionary object. 
+        The object represents hooks in runc.
+        Keys : types of hooks;
+        Values: paths to executables;
+        The generation is done by parsing the SCRIT_DIR directory
+        composed by subdirectories holding hook scripts of each type.
+        The names of the subdirectories must be the same as the hooks names 
+        which scripts they hold. 
+    """
 
     hooks_dict = {}
     for root, dirs, _ in os.walk(os.environ["SCRIPT_DIR"]):
         if not dirs:
-            # init the type of hook
+            # type of hook in dict := name of the dir 
             hook_type = root.split("/")[-1]
             hooks_dict[hook_type] = []
-            # parse the path contents
+            # parse the path file
             with open(root + "/" + "path") as file:
                 for line in file:
                     # separate path and arguments
@@ -73,8 +84,10 @@ def generate_hooks() -> dict:
 
 
 def run() -> None:
-    """Runs runc.Program flow: create, start, delete.
-        For the meaning of the env variables check runc --help"""
+    """Runs runc with the created bundle.
+       Program flow: create, start, delete.
+       For the meaning of the env variables check 'runc --help'
+    """
 
     print("Creating..")
     # create
@@ -88,7 +101,7 @@ def run() -> None:
             print(proc.stderr)
             sys.exit(proc.returncode)
      
-    yield 
+    yield "Create phase completed"
     print("Starting..")
     # start
     with subprocess.Popen([
@@ -99,7 +112,7 @@ def run() -> None:
             print(proc.stderr)
             sys.exit(proc.returncode)
     
-    yield
+    yield "Start phase completed"
     print("Deleting...")
     # delete
     with subprocess.Popen([
@@ -110,7 +123,7 @@ def run() -> None:
             print(proc.stderr)
             sys.exit(proc.returncode)
  
-    print("Done")
+    print("Delete phase completed") 
     sys.exit(0)
 
 
@@ -121,14 +134,14 @@ def main():
     org_conf = generate_config_return_json()
     if not org_conf:
         sys.exit(-1)
-    # customize the original configuration
+    # customize the original configuration of runc
     customize(org_conf)
     # write down the configuration file
     with open("{}/config.json".format(os.environ["BUNDLEDIR"]), "w") as file1: # erases old content
         file1.write(json.dumps(org_conf))
     # launch
-    for _ in run():
-        print("Continue? [press enter]")
+    for msg in run():
+        print("{msg}\nContinue? [press enter]".format(msg=msg))
         input()
 
 if __name__ == "__main__":

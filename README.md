@@ -1,24 +1,57 @@
-A small POC on the hooks feature of *runc*. The program builds a bundle with a custom config.json file. The hooks section of this file is filled with the contents of the scripts-hooks directory. Each represents a type of hook and contains files to be executed by the hook process. Each directory contains a file named `path` which contains the following data **for each file in the directory** :
-- <path-to-executable>
-- <arguments>
+This project is a small POC on the hooks feature of *runc*. It was created as a support for the Quarkslab blogpost article on the container runtime. 
+The program builds a runtime bundle and customize the default config.json file. Then a runc container is launched with the initialized bundle 
+
+
+# Customization of config.json
+
+To customize the fields which are different from the "hooks" json field, create a json file and indicate its position using the `ADDCNF` variable within the Dockerfile.
+
+If you want to add hooks add the directory path where the hooks will be placed to the SCRIPT_DIR variable in the Dockerfile. Please read the format of the hooks directory.
+
+# Hooks directory
+ The hooks directory has to follow the following format:
+ - <type-of-hook>
+    - path
+
+The name of the directory (here <type-of-hook>) has to be one of the following:
+
+- **createRuntime**;
+- **createContainer**;
+- **startContainer**;
+- **poststart  hook**;
+- **poststop hook**;
+
+
+Each directory must contain a file named `path` which follows the format:
+- <path-to-executable>;<arguments-;-separated>
+
+Eg:
+```text
+/bin/bash;-c;/h00ks/scripts-hooks/poststart/postStart.sh
+```
  
- If you have 3 scripts in this directory you'll have 6 lines in this file. Each line corresponds to a uniaque file in an alphabetic order. 
-
-The default POC h00ks do the following:
-
+The default POC scripts do the following:
 - createRuntime hook - inits a network stack in a new network namespace.
 - createContainer hook - tests the connectivity between the two net namespaces.
 - startContainer hook - gives information about the environment.
 - poststart  hook - launches a http server in the root network namespace.
 - poststop hook - cleans up the network namespace and other processes.
 
-For more information about the contexts of execution of the above processes please refer to the article.
 
-Build and Launch with 
-```
-$> docker build -t hook . < Dockerfile
+For more information about the contexts of execution of the above processes please refer to the blogpost article.
+
+# Build and launch
+The project can be build using the standard docker build way.
+
+## Build
+```bash
+$> docker build -t hook
+````
+## Launch
+Runc needs to be able to create cgroups hence to modify the cgroups vfs which are mounted inside. The default AppArmor policy of Docker doesn't allow that hence a container has to be launched using the `privileged` flag:
+
+```bash
 $> docker run --privileged -it -v $(pwd)/results-scripts/:/h00ks/results-scripts hook
-
 ```
 
-Privileged flag is needed for write access to the cgroups vfs. 
+

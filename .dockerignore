@@ -1,6 +1,7 @@
 Dockerfile
 README.md
-config.json
+bundle/config.json
 .git
 .gitignore
+results-scrits
 .dockerignore

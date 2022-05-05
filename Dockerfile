@@ -1,7 +1,7 @@
 FROM alpine:latest
 MAINTAINER "crypt0n1t3"
 
-ARG ROOTFSTAR="/h00ks/alpine-rootfs-docker-export-x86_64.tar"
+ARG ROOTFSTAR="alpine-rootfs-docker-export-x86_64.tar"
 
 RUN apk update && \
 	apk add runc && \
@@ -16,7 +16,5 @@ ENV CDIR="/h00ks" SCRIPT_DIR="/h00ks/scripts-hooks" ADDCNF="/h00ks/config-add.js
 WORKDIR "/h00ks"
 RUN mkdir -p bundle/rootfs && \
 	tar xf ${ROOTFSTAR} -C bundle/rootfs && \
-	chmod 755 transform.py && \
-	mkdir -p results-scripts; \
-	rm bundle/config.json 2>/dev/null
-CMD ["./transform.py"]
+	chmod 755 run.py; 
+CMD ["./run.py"]
