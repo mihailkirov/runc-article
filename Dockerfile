@@ -14,7 +14,7 @@ ENV CDIR="/h00ks" SCRIPT_DIR="/h00ks/scripts-hooks" ADDCNF="/h00ks/config-add.js
 	BUNDLEDIR="/h00ks/bundle"  GOPT="" CNAME="c"
 
 WORKDIR "/h00ks"
-RUN mkdir -p bundle/rootfs && \
+RUN 	mkdir -p bundle/rootfs && \
 	tar xf ${ROOTFSTAR} -C bundle/rootfs && \
 	chmod 755 run.py; 
 CMD ["./run.py"]
